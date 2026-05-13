@@ -140,7 +140,7 @@ function getTodosUsuarios(){
 $(document).ready(function(){
   renderListas();
   poblarSelectorSucursal();
-  poblarSelectorSucursalMJ();
+  // poblarSelectorSucursalMJ();
 
   // Cambio de producto → reset total y memoria
   $("#producto").change(function(){
@@ -356,7 +356,7 @@ function actualizarTotales(){
       .filter(function(){ return (parseInt($(this).val()) || 0) > 0; }).last();
     $last.val(Math.max(0, (parseInt($last.val()) || 0) - exceso));
 
-    alert(`⚠️ No puedes asignar más de ${totalRegistros.toLocaleString()} registros en total.\nSe ajustó el valor automáticamente.`);
+    customAlert(`⚠️ No puedes asignar más de ${totalRegistros.toLocaleString()} registros en total.\nSe ajustó el valor automáticamente.`);
     actualizarTotales();
     return;
   }
@@ -420,7 +420,7 @@ function cargarVistaSucursal(){
 
   const registros = memoriaAsignaciones[sucursal] || 0;
   if(registros === 0){
-    alert(`⚠️ La sucursal "${sucursal}" no tiene registros asignados desde el Orquestador.`);
+    customAlert(`⚠️ La sucursal "${sucursal}" no tiene registros asignados desde el Orquestador.`);
   }
 
   const ejecutivos = ejecutivosPorSucursal[sucursal]
@@ -518,7 +518,7 @@ function calcularSinAsignarJefe(){
     const $last  = $(".ejecutivo-input")
       .filter(function(){ return (parseInt($(this).val())||0) > 0; }).last();
     $last.val(Math.max(0, (parseInt($last.val())||0) - exceso));
-    alert(`⚠️ No puedes superar los ${total.toLocaleString()} registros de esta sucursal.`);
+    customAlert(`⚠️ No puedes superar los ${total.toLocaleString()} registros de esta sucursal.`);
     calcularSinAsignarJefe();
     return;
   }
@@ -548,14 +548,14 @@ function calcularSinAsignarJefe(){
 
 function guardarAsignacionJefe(){
   const sucursal = $("#sucursalActiva").val();
-  if(!sucursal){ alert("⚠️ Seleccione una sucursal primero."); return; }
+  if(!sucursal){ customAlert("⚠️ Seleccione una sucursal primero."); return; }
 
   const total    = memoriaAsignaciones[sucursal] || 0;
   let   asignado = 0;
   $(".ejecutivo-input").each(function(){ asignado += parseInt($(this).val()) || 0; });
 
-  if(total === 0){ alert("⚠️ Esta sucursal no tiene registros asignados desde el Orquestador."); return; }
-  if(asignado === 0){ alert("⚠️ Debes asignar al menos un registro a un ejecutivo."); return; }
+  if(total === 0){ customAlert("⚠️ Esta sucursal no tiene registros asignados desde el Orquestador."); return; }
+  if(asignado === 0){ customAlert("⚠️ Debes asignar al menos un registro a un ejecutivo."); return; }
   if(asignado < total){
     const ok = confirm(`⚠️ Quedan ${(total-asignado).toLocaleString()} registros sin asignar.\n¿Deseas guardar de todas formas?`);
     if(!ok) return;
@@ -855,11 +855,11 @@ function confirmarCrearUsuario(){
   const nombre    = $("#crearNombre").val().trim();
 
   // Validaciones
-  if(!licencia){ alert("⚠️ Seleccione una licencia."); return; }
-  if(!zona)    { alert("⚠️ Seleccione una zona.");     return; }
-  if(!grupo)   { alert("⚠️ Seleccione un grupo.");     return; }
-  if(!sucursal){ alert("⚠️ Seleccione una sucursal."); return; }
-  if(!nombre)  { alert("⚠️ Ingrese el nombre del usuario."); return; }
+  if(!licencia){ customAlert("⚠️ Seleccione una licencia."); return; }
+  if(!zona)    { customAlert("⚠️ Seleccione una zona.");     return; }
+  if(!grupo)   { customAlert("⚠️ Seleccione un grupo.");     return; }
+  if(!sucursal){ customAlert("⚠️ Seleccione una sucursal."); return; }
+  if(!nombre)  { customAlert("⚠️ Ingrese el nombre del usuario."); return; }
 
   // Agregar a la data en memoria
   const nuevoId = getTodosUsuarios().length + 1;
@@ -923,7 +923,7 @@ function filtrarUsuariosBaja(){
 
 function confirmarBajaUsuario(){
   const userId = parseInt($("#bajaUsuarioSelect").val());
-  if(!userId){ alert("⚠️ Seleccione un usuario para dar de baja."); return; }
+  if(!userId){ customAlert("⚠️ Seleccione un usuario para dar de baja."); return; }
 
   // Marcar como inactivo en memoria
   let encontrado = null;
@@ -932,7 +932,7 @@ function confirmarBajaUsuario(){
     if(u){ u.activo = false; encontrado = u; }
   });
 
-  if(!encontrado){ alert("⚠️ Usuario no encontrado."); return; }
+  if(!encontrado){ customAlert("⚠️ Usuario no encontrado."); return; }
 
   bootstrap.Modal.getInstance(document.getElementById("modalBajaUsuario")).hide();
   renderTablaUsuarios();
@@ -987,7 +987,7 @@ function mBuscarRegistros(){
   const orden  = $("#mFiltroOrdenMonto").val();
 
   if(!prod){
-    alert("⚠️ Seleccione un producto primero.");
+    customAlert("⚠️ Seleccione un producto primero.");
     return;
   }
 
@@ -1124,7 +1124,7 @@ function mActualizarEjecutivos(sel, rowId){
 function mReasignar(){
   const filas = $("#mTbodyReasignacion tr:not(#mFilaVacia)").length;
   if(!filas){
-    alert("⚠️ Agrega al menos una fila de reasignación.");
+    customAlert("⚠️ Agrega al menos una fila de reasignación.");
     return;
   }
 
@@ -1140,7 +1140,7 @@ function mReasignar(){
   });
 
   if(!valido){
-    alert("⚠️ Completa Zona, Sucursal y Ejecutivo en todas las filas.");
+    customAlert("⚠️ Completa Zona, Sucursal y Ejecutivo en todas las filas.");
     return;
   }
 
@@ -1165,3 +1165,208 @@ $(document).on("click", ".btn-eliminar-fila-m", function(){
       </tr>`);
   }
 });
+
+function customAlert(msg){
+  // ocupar modal para alertas personalizadas
+  $("#customAlertMessage").text(msg);
+  new bootstrap.Modal(document.getElementById("customAlert")).show();
+}
+
+// =========================
+// MANTENEDOR JEFE SUCURSAL
+// =========================
+
+function poblarSelectorSucursalMJ(){
+  let opts = `<option value="">-- Seleccione sucursal --</option>`;
+  sucursales.forEach(s => { opts += `<option value="${s}">${s}</option>`; });
+  $("#mjSucursalActiva").html(opts);
+}
+
+function mjActualizarRegistros(){
+  poblarSelectorSucursalMJ();
+
+  const totalGlobal = Object.values(memoriaAsignaciones)
+    .reduce((a,v) => a + v, 0);
+  $("#mjRegistrosAsignados").text(totalGlobal.toLocaleString());
+
+  const suc = $("#mjSucursalActiva").val();
+  if(suc){
+    mjCargarEjecutivos(suc);
+  } else {
+    $("#mjTotalSucursal").text(0);
+    $("#mjSinAsignar").text(0);
+    $("#mjTbodyReasignacion").html(`
+      <tr><td colspan="4" class="text-center text-muted py-3">
+        Seleccione una sucursal para ver sus ejecutivos
+      </td></tr>`);
+  }
+}
+
+function mjCargarEjecutivos(sucursal){
+  const total      = memoriaAsignaciones[sucursal] || 0;
+  const ejecutivos = ejecutivosPorSucursal[sucursal]
+    || Array.from({length:2}, (_,i) => `Ejecutivo ${i+1}`);
+
+  $("#mjTotalSucursal").text(total.toLocaleString());
+
+  if(total === 0){
+    customAlert(`⚠️ La sucursal "${sucursal}" no tiene registros asignados desde el Orquestador.`);
+  }
+
+  $("#mjTbodyReasignacion").empty();
+
+  ejecutivos.forEach(ej => {
+    const asignado = (memoriaEjecutivos[sucursal] && memoriaEjecutivos[sucursal][ej])
+      ? memoriaEjecutivos[sucursal][ej] : 0;
+
+    $("#mjTbodyReasignacion").append(`
+      <tr>
+        <td class="text-center">
+          <input type="checkbox" class="form-check-input" checked/>
+        </td>
+        <td>${ej}</td>
+        <td>
+          <input type="number" min="0" value="${asignado}"
+            class="form-control form-control-sm mj-ejecutivo-input"
+            data-ejecutivo="${ej}"
+            data-sucursal="${sucursal}"
+            oninput="mjValidarExceso()">
+        </td>
+        <td class="text-center">
+          <button class="btn btn-outline-danger btn-sm py-0 px-1 btn-eliminar-fila-mj">
+            <i class="bi bi-trash"></i>
+          </button>
+        </td>
+      </tr>`);
+  });
+
+  mjValidarExceso();
+}
+
+function mjValidarExceso(){
+  const sucursal = $("#mjSucursalActiva").val();
+  const total    = memoriaAsignaciones[sucursal] || 0;
+  let   asignado = 0;
+
+  $(".mj-ejecutivo-input").each(function(){
+    asignado += parseInt($(this).val()) || 0;
+  });
+
+  const restante = total - asignado;
+  $("#mjSinAsignar").text(restante < 0 ? 0 : restante);
+  $("#mjSinAsignar").css("color", restante <= 0 && total > 0 ? "var(--success)" : "var(--danger)");
+
+  if(asignado > total && total > 0){
+    const exceso = asignado - total;
+    const $last  = $(".mj-ejecutivo-input")
+      .filter(function(){ return (parseInt($(this).val())||0) > 0; }).last();
+    $last.val(Math.max(0, (parseInt($last.val())||0) - exceso));
+    customAlert(`⚠️ No puedes superar los ${total.toLocaleString()} registros asignados.`);
+    mjValidarExceso();
+  }
+}
+
+function mjBuscarRegistros(){
+  const prod  = $("#mjFiltroProducto").val();
+  const orden = $("#mjFiltroOrden").val();
+  let regs    = [...(registrosPorProducto[prod] || [])];
+
+  regs.sort((a,b) => orden === "De menor a mayor" ? a.monto - b.monto : b.monto - a.monto);
+
+  if(!regs.length){
+    $("#mjTbodyPreview").html(`
+      <tr><td colspan="4" class="text-center text-muted py-3">Sin registros</td></tr>`);
+    return;
+  }
+
+  $("#mjTbodyPreview").html(
+    regs.map(r => `
+      <tr>
+        <td>${r.producto}</td>
+        <td>${r.asignacion}</td>
+        <td class="text-success fw-bold">${fmtMonto(r.monto)}</td>
+        <td><span class="badge bg-light text-dark border">${r.segmento}</span></td>
+      </tr>`
+    ).join("")
+  );
+}
+
+function mjLimpiarFiltros(){
+  $("#mjFiltroEstado, #mjFiltroProducto, #mjFiltroOrden").prop("selectedIndex", 0);
+  $("#mjTbodyPreview").html(`
+    <tr><td colspan="4" class="text-center text-muted py-4">
+      <i class="bi bi-search me-1"></i>Aplique filtros para ver datos
+    </td></tr>`);
+}
+
+function mjAgregarFila(){
+  const sucursal   = $("#mjSucursalActiva").val();
+  const ejecutivos = sucursal
+    ? (ejecutivosPorSucursal[sucursal] || ["Ejecutivo 1","Ejecutivo 2"])
+    : ["Ejecutivo 1","Ejecutivo 2"];
+  const opts = ejecutivos.map(e => `<option>${e}</option>`).join("");
+
+  // Quitar fila vacía si existe
+  $("#mjTbodyReasignacion tr:has(td[colspan])").remove();
+
+  $("#mjTbodyReasignacion").append(`
+    <tr>
+      <td class="text-center">
+        <input type="checkbox" class="form-check-input" checked/>
+      </td>
+      <td>
+        <select class="form-select form-select-sm">${opts}</select>
+      </td>
+      <td>
+        <input type="number" min="0" value="0"
+          class="form-control form-control-sm mj-ejecutivo-input"
+          data-sucursal="${sucursal}"
+          oninput="mjValidarExceso()">
+      </td>
+      <td class="text-center">
+        <button class="btn btn-outline-danger btn-sm py-0 px-1 btn-eliminar-fila-mj">
+          <i class="bi bi-trash"></i>
+        </button>
+      </td>
+    </tr>`);
+}
+
+function mjReasignar(){
+  const sucursal = $("#mjSucursalActiva").val();
+  if(!sucursal){ customAlert("⚠️ Seleccione una sucursal primero."); return; }
+
+  const total    = memoriaAsignaciones[sucursal] || 0;
+  let   asignado = 0;
+  $(".mj-ejecutivo-input").each(function(){ asignado += parseInt($(this).val()) || 0; });
+
+  if(total === 0){ customAlert("⚠️ Esta sucursal no tiene registros asignados."); return; }
+  if(asignado === 0){ customAlert("⚠️ Ingresa al menos un registro para reasignar."); return; }
+  if(asignado < total){
+    if(!confirm(`⚠️ Quedan ${(total-asignado).toLocaleString()} registros sin asignar.\n¿Confirmas la reasignación?`)) return;
+  }
+
+  if(!memoriaEjecutivos[sucursal]) memoriaEjecutivos[sucursal] = {};
+  $(".mj-ejecutivo-input").each(function(){
+    const ej  = $(this).data("ejecutivo");
+    const val = parseInt($(this).val()) || 0;
+    if(ej) memoriaEjecutivos[sucursal][ej] = val;
+  });
+
+  $("#mjMsgExito").show();
+  setTimeout(() => $("#mjMsgExito").fadeOut(600), 3000);
+}
+
+$(document).on("click", ".btn-eliminar-fila-mj", function(){
+  $(this).closest("tr").remove();
+  if($("#mjTbodyReasignacion tr").length === 0){
+    $("#mjTbodyReasignacion").html(`
+      <tr><td colspan="4" class="text-center text-muted py-3">
+        Seleccione una sucursal para ver sus ejecutivos
+      </td></tr>`);
+  }
+  mjValidarExceso();
+});
+
+// Stub para filtros opcionales (vistaJefe)
+function aplicarFiltro1(){ /* reservado */ }
+function aplicarFiltro2(){ /* reservado */ }
