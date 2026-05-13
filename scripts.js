@@ -556,44 +556,50 @@ function guardarAsignacionJefe(){
 
   if(total === 0){ customAlert("⚠️ Esta sucursal no tiene registros asignados desde el Orquestador."); return; }
   if(asignado === 0){ customAlert("⚠️ Debes asignar al menos un registro a un ejecutivo."); return; }
+
+  const ejecutarGuardado = function(){
+    if(!memoriaEjecutivos[sucursal]) memoriaEjecutivos[sucursal] = {};
+
+    const regs   = registrosFiltrados.length > 0 ? registrosFiltrados : getRegistrosActivos();
+    let   tbody  = "";
+    let   usados = 0;
+
+    $(".ejecutivo-input").each(function(){
+      const ej  = $(this).data("ejecutivo");
+      const val = parseInt($(this).val()) || 0;
+      memoriaEjecutivos[sucursal][ej] = val;
+
+      const regsEj = regs.slice(usados, usados + val);
+      const monto  = regsEj.reduce((s,r) => s + r.monto, 0);
+      usados += val;
+
+      const clase = val > 0 ? "estado-asignado" : "estado-pendiente";
+      const label = val > 0 ? "Asignado"        : "Pendiente";
+
+      tbody += `
+        <tr>
+          <td><strong>${ej}</strong></td>
+          <td class="text-center">${val.toLocaleString()}</td>
+          <td class="text-success fw-bold">${fmtMonto(monto)}</td>
+          <td><span class="estado-badge ${clase}">${label}</span></td>
+        </tr>`;
+    });
+
+    $("#tablaResumenJefe").html(tbody);
+    $("#resumenJefeCard").show();
+    $("#msgExito").show();
+    setTimeout(() => $("#msgExito").fadeOut(600), 3000);
+    $("html,body").animate({ scrollTop: $("#resumenJefeCard").offset().top - 20 }, 400);
+  };
+
   if(asignado < total){
-    const ok = confirm(`⚠️ Quedan ${(total-asignado).toLocaleString()} registros sin asignar.\n¿Deseas guardar de todas formas?`);
-    if(!ok) return;
+    customConfirm(
+      `⚠️ Quedan ${(total - asignado).toLocaleString()} registros sin asignar. ¿Deseas guardar de todas formas?`,
+      function(confirmed){ if(confirmed) ejecutarGuardado(); }
+    );
+  } else {
+    ejecutarGuardado();
   }
-
-  if(!memoriaEjecutivos[sucursal]) memoriaEjecutivos[sucursal] = {};
-
-  const regs  = registrosFiltrados.length > 0 ? registrosFiltrados : getRegistrosActivos();
-  let   tbody = "";
-  let   usados = 0;
-
-  $(".ejecutivo-input").each(function(){
-    const ej  = $(this).data("ejecutivo");
-    const val = parseInt($(this).val()) || 0;
-    memoriaEjecutivos[sucursal][ej] = val;
-
-    // Monto: sumar registros correspondientes en orden
-    const regsEj = regs.slice(usados, usados + val);
-    const monto  = regsEj.reduce((s,r) => s + r.monto, 0);
-    usados += val;
-
-    const clase = val > 0 ? "estado-asignado" : "estado-pendiente";
-    const label = val > 0 ? "Asignado"        : "Pendiente";
-
-    tbody += `
-      <tr>
-        <td><strong>${ej}</strong></td>
-        <td class="text-center">${val.toLocaleString()}</td>
-        <td class="text-success fw-bold">${fmtMonto(monto)}</td>
-        <td><span class="estado-badge ${clase}">${label}</span></td>
-      </tr>`;
-  });
-
-  $("#tablaResumenJefe").html(tbody);
-  $("#resumenJefeCard").show();
-  $("#msgExito").show();
-  setTimeout(() => $("#msgExito").fadeOut(600), 3000);
-  $("html,body").animate({ scrollTop: $("#resumenJefeCard").offset().top - 20 }, 400);
 }
 
 function aplicarFiltrosMonto(){
@@ -1123,35 +1129,32 @@ function mActualizarEjecutivos(sel, rowId){
 
 function mReasignar(){
   const filas = $("#mTbodyReasignacion tr:not(#mFilaVacia)").length;
-  if(!filas){
-    customAlert("⚠️ Agrega al menos una fila de reasignación.");
-    return;
-  }
+  if(!filas){ customAlert("⚠️ Agrega al menos una fila de reasignación."); return; }
 
-  // Validar que cada fila tenga zona, sucursal y ejecutivo
   let valido = true;
   $("#mTbodyReasignacion tr:not(#mFilaVacia)").each(function(){
-    const zona     = $(this).find(".msel-zona").val();
-    const sucursal = $(this).find(".msel-sucursal").val();
-    const ejecutivo= $(this).find(".msel-ejecutivo").val();
-    if(!zona || !sucursal || !ejecutivo){
-      valido = false;
-    }
+    const zona      = $(this).find(".msel-zona").val();
+    const sucursal  = $(this).find(".msel-sucursal").val();
+    const ejecutivo = $(this).find(".msel-ejecutivo").val();
+    if(!zona || !sucursal || !ejecutivo) valido = false;
   });
 
-  if(!valido){
-    customAlert("⚠️ Completa Zona, Sucursal y Ejecutivo en todas las filas.");
-    return;
-  }
+  if(!valido){ customAlert("⚠️ Completa Zona, Sucursal y Ejecutivo en todas las filas."); return; }
+
+  const ejecutarReasignacion = function(){
+    $("#mMsgExito").show();
+    setTimeout(() => $("#mMsgExito").fadeOut(600), 3000);
+  };
 
   const seleccionados = $(".mcheck:checked").length;
   if(!seleccionados){
-    const ok = confirm("⚠️ No hay registros seleccionados en la tabla.\n¿Reasignar de todas formas?");
-    if(!ok) return;
+    customConfirm(
+      "⚠️ No hay registros seleccionados en la tabla. ¿Reasignar de todas formas?",
+      function(confirmed){ if(confirmed) ejecutarReasignacion(); }
+    );
+  } else {
+    ejecutarReasignacion();
   }
-
-  $("#mMsgExito").show();
-  setTimeout(() => $("#mMsgExito").fadeOut(600), 3000);
 }
 
 $(document).on("click", ".btn-eliminar-fila-m", function(){
@@ -1172,6 +1175,19 @@ function customAlert(msg){
   new bootstrap.Modal(document.getElementById("customAlert")).show();
 }
 
+function customConfirm(msg, callback){
+  $("#confirmacionMessage").text(msg);
+  const modal = new bootstrap.Modal(document.getElementById("confirmacionModal"));
+  $("#confirmacionBtn").off("click").on("click", function(){
+    callback(true);
+    modal.hide();
+  });
+  $("#confirmacionCancel").off("click").on("click", function(){
+    callback(false);
+    modal.hide();
+  });
+}
+
 // =========================
 // MANTENEDOR JEFE SUCURSAL
 // =========================
@@ -1183,17 +1199,15 @@ function poblarSelectorSucursalMJ(){
 }
 
 function mjActualizarRegistros(){
-  poblarSelectorSucursalMJ();
-
-  const totalGlobal = Object.values(memoriaAsignaciones)
-    .reduce((a,v) => a + v, 0);
-  $("#mjRegistrosAsignados").text(totalGlobal.toLocaleString());
+  // Solo poblar si está vacío, no en cada llamada
+  if($("#mjSucursalActiva option").length <= 1){
+    poblarSelectorSucursalMJ();
+  }
 
   const suc = $("#mjSucursalActiva").val();
   if(suc){
     mjCargarEjecutivos(suc);
   } else {
-    $("#mjTotalSucursal").text(0);
     $("#mjSinAsignar").text(0);
     $("#mjTbodyReasignacion").html(`
       <tr><td colspan="4" class="text-center text-muted py-3">
@@ -1253,8 +1267,9 @@ function mjValidarExceso(){
   });
 
   const restante = total - asignado;
-  $("#mjSinAsignar").text(restante < 0 ? 0 : restante);
-  $("#mjSinAsignar").css("color", restante <= 0 && total > 0 ? "var(--success)" : "var(--danger)");
+  $("#mjSinAsignar")
+    .text(restante < 0 ? 0 : restante)
+    .css("color", restante <= 0 && total > 0 ? "var(--success)" : "var(--danger)");
 
   if(asignado > total && total > 0){
     const exceso = asignado - total;
@@ -1268,14 +1283,20 @@ function mjValidarExceso(){
 
 function mjBuscarRegistros(){
   const prod  = $("#mjFiltroProducto").val();
-  const orden = $("#mjFiltroOrden").val();
-  let regs    = [...(registrosPorProducto[prod] || [])];
+  const orden = $("#mjFiltroOrden").val(); // valor debe ser "asc" o "desc"
 
-  regs.sort((a,b) => orden === "De menor a mayor" ? a.monto - b.monto : b.monto - a.monto);
+  if(!prod){ customAlert("⚠️ Seleccione un producto primero."); return; }
+
+  let regs = [...(registrosPorProducto[prod] || [])];
+
+  // ← ANTES comparaba contra texto "De menor a mayor", ahora usa value
+  regs.sort((a,b) => orden === "asc" ? a.monto - b.monto : b.monto - a.monto);
 
   if(!regs.length){
     $("#mjTbodyPreview").html(`
-      <tr><td colspan="4" class="text-center text-muted py-3">Sin registros</td></tr>`);
+      <tr><td colspan="4" class="text-center text-muted py-3">
+        Sin registros para el producto seleccionado
+      </td></tr>`);
     return;
   }
 
@@ -1301,21 +1322,27 @@ function mjLimpiarFiltros(){
 
 function mjAgregarFila(){
   const sucursal   = $("#mjSucursalActiva").val();
-  const ejecutivos = sucursal
-    ? (ejecutivosPorSucursal[sucursal] || ["Ejecutivo 1","Ejecutivo 2"])
-    : ["Ejecutivo 1","Ejecutivo 2"];
-  const opts = ejecutivos.map(e => `<option>${e}</option>`).join("");
+  if(!sucursal){ customAlert("⚠️ Seleccione una sucursal primero."); return; }
 
-  // Quitar fila vacía si existe
+  const ejecutivos = ejecutivosPorSucursal[sucursal]
+    || Array.from({length:2}, (_,i) => `Ejecutivo ${i+1}`);
+
+  const opts = ejecutivos.map(e => `<option value="${e}">${e}</option>`).join("");
+
   $("#mjTbodyReasignacion tr:has(td[colspan])").remove();
 
+  const rowId = `mjRow_${Date.now()}`;
+
   $("#mjTbodyReasignacion").append(`
-    <tr>
+    <tr id="${rowId}">
       <td class="text-center">
         <input type="checkbox" class="form-check-input" checked/>
       </td>
       <td>
-        <select class="form-select form-select-sm">${opts}</select>
+        <!-- ← select con value, para que mjReasignar() lea el ejecutivo correctamente -->
+        <select class="form-select form-select-sm mj-sel-ejecutivo">
+          ${opts}
+        </select>
       </td>
       <td>
         <input type="number" min="0" value="0"
@@ -1341,19 +1368,33 @@ function mjReasignar(){
 
   if(total === 0){ customAlert("⚠️ Esta sucursal no tiene registros asignados."); return; }
   if(asignado === 0){ customAlert("⚠️ Ingresa al menos un registro para reasignar."); return; }
+
+    const ejecutarReasignacion = function(){
+    if(!memoriaEjecutivos[sucursal]) memoriaEjecutivos[sucursal] = {};
+
+    $(".mj-ejecutivo-input").each(function(){
+      // ← leer ejecutivo desde data-ejecutivo (filas originales)
+      //   o desde el select hermano (filas agregadas manualmente)
+      const $fila  = $(this).closest("tr");
+      const $sel   = $fila.find(".mj-sel-ejecutivo");
+      const ej     = $sel.length ? $sel.val() : $(this).data("ejecutivo");
+      const val    = parseInt($(this).val()) || 0;
+
+      if(ej) memoriaEjecutivos[sucursal][ej] = val;
+    });
+
+    $("#mjMsgExito").show();
+    setTimeout(() => $("#mjMsgExito").fadeOut(600), 3000);
+  };
+
   if(asignado < total){
-    if(!confirm(`⚠️ Quedan ${(total-asignado).toLocaleString()} registros sin asignar.\n¿Confirmas la reasignación?`)) return;
+    customConfirm(
+      `⚠️ Quedan ${(total - asignado).toLocaleString()} registros sin asignar. ¿Confirmas la reasignación?`,
+      function(confirmed){ if(confirmed) ejecutarReasignacion(); }
+    );
+  } else {
+    ejecutarReasignacion();
   }
-
-  if(!memoriaEjecutivos[sucursal]) memoriaEjecutivos[sucursal] = {};
-  $(".mj-ejecutivo-input").each(function(){
-    const ej  = $(this).data("ejecutivo");
-    const val = parseInt($(this).val()) || 0;
-    if(ej) memoriaEjecutivos[sucursal][ej] = val;
-  });
-
-  $("#mjMsgExito").show();
-  setTimeout(() => $("#mjMsgExito").fadeOut(600), 3000);
 }
 
 $(document).on("click", ".btn-eliminar-fila-mj", function(){
@@ -1366,7 +1407,3 @@ $(document).on("click", ".btn-eliminar-fila-mj", function(){
   }
   mjValidarExceso();
 });
-
-// Stub para filtros opcionales (vistaJefe)
-function aplicarFiltro1(){ /* reservado */ }
-function aplicarFiltro2(){ /* reservado */ }

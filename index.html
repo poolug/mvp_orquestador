@@ -233,7 +233,7 @@
           <button class="btn btn-primary px-5" onclick="guardarAsignacionJefe()">
             <i class="bi bi-save me-2"></i>Guardar
           </button>
-          <div class="asignacion-exitosa mt-2">
+          <div class="asignacion-exitosa mt-2" id="msgExitoJefe" style="display:none;">
             <i class="bi bi-star-fill me-1" style="color:#f59e0b;"></i>
             Asignación exitosa
           </div>
@@ -664,8 +664,8 @@
               <div class="filtro-row">
                 <label class="filtro-lbl">Ordenar</label>
                 <select class="form-select form-select-sm" id="mjFiltroOrden">
-                  <option>De menor a mayor</option>
-                  <option>De mayor a menor</option>
+                  <option value="asc">De menor a mayor</option>
+                  <option value="desc">De mayor a menor</option>
                 </select>
               </div>
             </div>
@@ -784,6 +784,25 @@
         </div>
         <div class="modal-body">
           <div id="customAlertMessage"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ALERTA CONFIRMACIÓN -->
+  <div class="modal fade" id="confirmacionModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">Confirmación</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="confirmacionMessage"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" id="confirmacionCancel" data-bs-dismiss="modal">Cancelar</button>
+          <button class="btn btn-primary" id="confirmacionBtn">Confirmar</button>
         </div>
       </div>
     </div>
