@@ -140,7 +140,7 @@ function getTodosUsuarios(){
 $(document).ready(function(){
   renderListas();
   poblarSelectorSucursal();
-  // poblarSelectorSucursalMJ();
+  poblarSelectorSucursalMJ();
 
   // Cambio de producto → reset total y memoria
   $("#producto").change(function(){
