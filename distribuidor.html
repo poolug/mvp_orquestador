@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Orquestador - Asignación de Carteras</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div class="main-container">
+
+    <!-- HEADER -->
+    <div class="header-card">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <div class="main-title">Orquestador</div>
+          <div class="subtitle">Gestión de asignaciones de carteras por grupos y sucursales</div>
+        </div>
+        <div class="col-md-4">
+          <label class="fw-bold mb-2">Producto</label>
+          <select class="form-select" id="producto">
+            <option value="1000">CONSOLIDACIÓN</option>
+            <option value="2500">HIPOTECARIO</option>
+            <option value="800">CONSUMO</option>
+            <option value="4000">EMPRESAS</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="nav-tabs-custom">
+      <a class="nav-link active" id="tab-orquestador" onclick="cambiarTab('orquestador')">
+        <i class="bi bi-diagram-3 me-2"></i>Orquestador
+      </a>
+      <a class="nav-link" id="tab-jefe" onclick="cambiarTab('jefe')">
+        <i class="bi bi-person-badge me-2"></i>Jefe de Sucursal
+      </a>
+      <a class="nav-link" id="tab-mantenedor" onclick="cambiarTab('mantenedor')">
+        <i class="bi bi-building-gear me-2"></i>Mantenedor Casa Matriz y Zonal
+      </a>
+      <a class="nav-link" id="tab-mantenedor-jefe" onclick="cambiarTab('mantenedorJefe')">
+        <i class="bi bi-person-lines-fill me-2"></i>Mantenedor Jefe de Sucursal
+      </a>
+    </div>
+
+    <!-- ===================== -->
+    <!-- VISTA ORQUESTADOR     -->
+    <!-- ===================== -->
+    <div id="vistaOrquestador">
+      <!-- RESUMEN -->
+      <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+          <div class="counter-box">
+            <div class="counter-title">Total Registros</div>
+            <div class="counter-number" id="totalRegistros">1000</div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="counter-box">
+            <div class="counter-title">Asignados</div>
+            <div class="counter-number text-success" id="asignados">0</div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="counter-box">
+            <div class="counter-title">Sin Asignar</div>
+            <div class="counter-number remaining-danger" id="sinAsignar">1000</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DISTRIBUCIÓN POR GRUPOS -->
+      <div class="section-card">
+        <div class="section-title">Distribución por Grupos</div>
+        <div class="row">
+          <div class="col-md-4">
+            <label class="fw-bold mb-2">Buscar Grupo</label>
+            <div class="search-box mb-3">
+              <i class="bi bi-search"></i>
+              <input type="text" id="buscarGrupo" class="form-control" placeholder="Buscar grupo...">
+            </div>
+            <div class="list-group" id="listaGrupos"></div>
+          </div>
+          <div class="col-md-8">
+            <div id="gruposSeleccionados">
+              <div class="empty-state">
+                <i class="bi bi-diagram-3 fs-1"></i>
+                <div class="mt-2">No hay grupos seleccionados</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="text-end mt-4">
+            <button class="btn btn-primary" id="guardarGrupo">
+                <i class="bi bi-save"></i> Guardar Distribución Grupo
+            </button>
+        </div>
+      </div>
+
+      <!-- DISTRIBUCIÓN MANUAL -->
+      <div class="section-card">
+        <div class="manual-title">CARGA MANUAL registros restantes</div>
+        <div class="row">
+          <div class="col-md-4">
+            <label class="fw-bold mb-2">Buscar Sucursal</label>
+            <div class="search-box mb-3">
+              <i class="bi bi-search"></i>
+              <input type="text" id="buscarSucursal" class="form-control" placeholder="Buscar sucursal...">
+            </div>
+            <div class="list-group" id="listaSucursales"></div>
+          </div>
+          <div class="col-md-8">
+            <div id="sucursalesSeleccionadas">
+              <div class="empty-state">
+                <i class="bi bi-building fs-1"></i>
+                <div class="mt-2">No hay sucursales seleccionadas</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="text-end mt-4">
+          <button class="btn btn-success" id="guardarSucursal">
+            <i class="bi bi-save"></i> Guardar Distribución Manual
+          </button>
+        </div>
+      </div>
+
+    </div><!-- fin vistaOrquestador -->
+
+    <!-- ===================== -->
+    <!-- VISTA JEFE SUCURSAL   -->
+    <!-- ===================== -->
+    <div id="vistaJefe" style="display:none;">
+      <!-- Selector de sucursal -->
+      <div class="section-card">
+        <div class="row align-items-end g-3">
+          <div class="col-md-4">
+            <label class="fw-bold mb-2">Sucursal activa</label>
+            <select class="form-select" id="sucursalActiva" onchange="cargarVistaSucursal()">
+              <option value="">-- Seleccione sucursal --</option>
+            </select>
+          </div>
+
+          <!-- FILTROS MONTO ──────────────────── -->
+          <div class="col-md-3">
+            <label class="fw-bold mb-2">
+              <i class="bi bi-arrow-up-circle me-1 text-success"></i>Monto mayor o igual a
+            </label>
+            <div class="input-group input-group-sm">
+              <span class="input-group-text">$</span>
+              <input type="number" id="filtroMontoMin" class="form-control"
+                placeholder="Ej: 1000000" min="0"
+                oninput="aplicarFiltrosMonto()">
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <label class="fw-bold mb-2">
+              <i class="bi bi-arrow-down-circle me-1 text-danger"></i>Monto menor o igual a
+            </label>
+            <div class="input-group input-group-sm">
+              <span class="input-group-text">$</span>
+              <input type="number" id="filtroMontoMax" class="form-control"
+                placeholder="Ej: 5000000" min="0"
+                oninput="aplicarFiltrosMonto()">
+            </div>
+          </div>
+
+          <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-outline-secondary w-100" onclick="borrarFiltros()">
+              <i class="bi bi-x-circle me-1"></i>Borrar filtro
+            </button>
+          </div>
+          <!-- FIN FILTROS MONTO ─────────────── -->
+
+        </div>
+      </div>
+
+      <!-- Registros en memoria -->
+      <div class="registros-badge" id="registrosBadge">
+        <div>
+          <div class="label">Registros asignados a la sucursal</div>
+          <div class="label" id="productoJefe" style="opacity:.7; font-size:13px;"></div>
+        </div>
+        <div class="value" id="totalJefe">0</div>
+      </div>
+
+      <!-- Asignación de ejecutivos -->
+      <div class="section-card">
+        <div class="section-title">Ejecutivos de la Sucursal</div>
+
+        <div class="row mb-3">
+          <div class="col-md-5">
+            <div class="search-box">
+              <i class="bi bi-search"></i>
+              <input type="text" id="buscarEjecutivo" class="form-control" placeholder="Buscar ejecutivo..." oninput="filtrarEjecutivos()">
+            </div>
+          </div>
+          <div class="col-md-4 d-flex align-items-center gap-3 d-none">
+            <a class="filtro-link" onclick="aplicarFiltro1()">
+              <i class="bi bi-funnel"></i> Filtro opcional 1
+            </a>
+            <a class="filtro-link" onclick="aplicarFiltro2()">
+              <i class="bi bi-funnel"></i> Filtro opcional 2
+            </a>
+          </div>
+          <div class="col-md-3 text-end d-flex align-items-center justify-content-end gap-2">
+            <a class="filtro-link" onclick="borrarFiltros()">
+              <i class="bi bi-x-circle"></i> Borrar filtro
+            </a>
+          </div>
+        </div>
+
+        <div id="listaEjecutivos">
+          <div class="empty-state">
+            <i class="bi bi-people fs-1"></i>
+            <div class="mt-2">Seleccione una sucursal para ver sus ejecutivos</div>
+          </div>
+        </div>
+
+        <!-- Registros sin asignar -->
+        <div class="d-flex justify-content-between align-items-center mt-4 px-2">
+          <span class="fw-bold fs-5">Registros sin asignar</span>
+          <span class="fw-bold fs-4" id="sinAsignarJefe" style="color:var(--danger);">0</span>
+        </div>
+
+        <div class="text-center mt-4">
+          <button class="btn btn-primary px-5" onclick="guardarAsignacionJefe()">
+            <i class="bi bi-save me-2"></i>Guardar
+          </button>
+          <div class="asignacion-exitosa mt-2" id="msgExito">
+            <i class="bi bi-star-fill me-1" style="color:#f59e0b;"></i>
+            Asignación exitosa
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla resumen -->
+      <div class="section-card" id="resumenJefeCard" style="display:none;">
+        <div class="section-title">
+          <i class="bi bi-clipboard-check me-2"></i>Resumen de Asignación
+        </div>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover align-middle table-resumen">
+            <thead>
+              <tr>
+                <th>Ejecutivo</th>
+                <th>Registros</th>
+                <th>Monto Asignado</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tablaResumenJefe"></tbody>
+          </table>
+        </div>
+        <div class="asignacion-exitosa mt-3" id="msgExito" style="display:none;">
+          <i class="bi bi-star-fill me-1" style="color:#f59e0b;"></i>Asignación guardada exitosamente
+        </div>
+      </div>
+    </div><!-- fin vistaJefe -->
+
+    <!-- ========================= -->
+    <!-- VISTA MANTENEDOR          -->
+    <!-- ========================= -->
+    <div id="vistaMantenedor" style="display:none;">
+
+      <!-- TABLA USUARIOS ──────────────────────────────────────── -->
+      <div class="section-card mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="section-title mb-0">
+            <i class="bi bi-people me-2"></i>Usuarios registrados
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary btn-sm" onclick="abrirModalCrear()">
+              <i class="bi bi-person-plus me-1"></i>Crear usuario
+            </button>
+            <button class="btn btn-outline-danger btn-sm" onclick="abrirModalBaja()">
+              <i class="bi bi-person-dash me-1"></i>Baja de usuario
+            </button>
+          </div>
+        </div>
+
+        <!-- Filtros rápidos tabla usuarios -->
+        <div class="row g-2 mb-3">
+          <div class="col-md-3">
+            <select class="form-select form-select-sm" id="filtroTablaZona"
+              onchange="renderTablaUsuarios()">
+              <option value="">Todas las zonas</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select form-select-sm" id="filtroTablaSucursal"
+              onchange="renderTablaUsuarios()">
+              <option value="">Todas las sucursales</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select form-select-sm" id="filtroTablaLicencia"
+              onchange="renderTablaUsuarios()">
+              <option value="">Todas las licencias</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-outline-secondary btn-sm w-100"
+              onclick="limpiarFiltrosTabla()">
+              <i class="bi bi-x-circle me-1"></i>Limpiar filtros
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabla usuarios con scroll fijo -->
+        <div style="max-height:260px; overflow-y:auto; border:1px solid var(--border); border-radius:10px;">
+          <table class="table table-sm table-bordered table-hover align-middle table-resumen mb-0">
+            <thead style="position:sticky; top:0; z-index:2;">
+              <tr>
+                <th>#</th>
+                <th>Nombre</th>
+                <th>Licencia</th>
+                <th>Zona</th>
+                <th>Grupo</th>
+                <th>Sucursal</th>
+                <th style="width:80px">Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyUsuarios"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- FILTROS REASIGNACIÓN ─────────────────────────────────── -->
+      <div class="section-card mb-4">
+        <div class="section-title">
+          <i class="bi bi-funnel me-2"></i>Reasignación de registros
+          <span class="badge bg-secondary ms-2 fw-normal" style="font-size:.7rem;">
+            Depende del Perfil
+          </span>
+        </div>
+        <div class="subtitle mb-4">Estado del registro de acuerdo a la selección</div>
+
+        <div class="row g-3 align-items-end">
+
+          <!-- Producto -->
+          <div class="col-md-3">
+            <label class="filtro-lbl">Producto</label>
+            <select class="form-select form-select-sm" id="mFiltroProducto"
+              onchange="mCargarFechas()">
+              <option value="">-- Seleccione --</option>
+              <option>CONSOLIDACIÓN</option>
+              <option>HIPOTECARIO</option>
+              <option>CONSUMO</option>
+              <option>EMPRESAS</option>
+            </select>
+          </div>
+
+          <!-- Asignación (fechas dinámicas) -->
+          <div class="col-md-3">
+            <label class="filtro-lbl">Asignación</label>
+            <select class="form-select form-select-sm" id="mFiltroAsignacion">
+              <option value="">-- Seleccione producto --</option>
+            </select>
+          </div>
+
+          <!-- Cantidad de registros (solo lectura, se llena al buscar) -->
+          <div class="col-md-2">
+            <label class="filtro-lbl">Cantidad registros</label>
+            <input type="text" class="form-control form-control-sm"
+              id="mCantidadRegistros" readonly placeholder="—">
+          </div>
+
+          <!-- Monto orden -->
+          <div class="col-md-2">
+            <label class="filtro-lbl">Oferta / Deuda (monto)</label>
+            <select class="form-select form-select-sm" id="mFiltroOrdenMonto">
+              <option value="asc">De menor a mayor</option>
+              <option value="desc">De mayor a menor</option>
+            </select>
+          </div>
+
+          <!-- Botones -->
+          <div class="col-md-2 d-flex gap-2">
+            <button class="btn btn-primary btn-sm flex-fill" onclick="mBuscarRegistros()">
+              <i class="bi bi-search me-1"></i>Buscar
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="mLimpiarFiltros()"
+              title="Limpiar">
+              <i class="bi bi-x-circle"></i>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TABLA VISUALIZACIÓN DATA ────────────────────────────── -->
+      <div class="section-card mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="section-title mb-0">
+            <i class="bi bi-table me-2"></i>Visualización Data a Asignar
+          </div>
+          <span class="badge bg-primary" id="mBadgeCantidad" style="display:none;">
+            0 registros
+          </span>
+        </div>
+
+        <div style="max-height:280px; overflow-y:auto; border:1px solid var(--border); border-radius:10px;">
+          <table class="table table-sm table-bordered table-hover align-middle mb-0">
+            <thead style="position:sticky; top:0; z-index:2;">
+              <tr>
+                <th style="width:36px">
+                  <input type="checkbox" class="form-check-input" id="checkTodos"
+                    onchange="toggleCheckTodos(this)">
+                </th>
+                <th>Producto</th>
+                <th>Asignación</th>
+                <th>Monto</th>
+                <th>Segmento</th>
+              </tr>
+            </thead>
+            <tbody id="mTbodyRegistros">
+              <tr>
+                <td colspan="5" class="text-center text-muted py-4">
+                  <i class="bi bi-search me-1"></i>Aplique filtros para ver datos
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TABLA REASIGNACIÓN ───────────────────────────────────── -->
+      <div class="section-card mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="section-title mb-0">
+            <i class="bi bi-arrow-left-right me-2"></i>Reasignar registros seleccionados
+          </div>
+          <button class="btn btn-outline-secondary btn-sm" onclick="mAgregarFilaReasignacion()">
+            <i class="bi bi-plus-circle me-1"></i>Agregar fila
+          </button>
+        </div>
+
+        <div class="table-responsive mb-3">
+          <table class="table table-sm table-bordered align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th style="width:36px"></th>
+                <th>Zona</th>
+                <th>Sucursal</th>
+                <th>Ejecutivo</th>
+                <th style="width:36px"></th>
+              </tr>
+            </thead>
+            <tbody id="mTbodyReasignacion">
+              <tr id="mFilaVacia">
+                <td colspan="5" class="text-center text-muted py-3">
+                  Agregue filas para reasignar
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-end align-items-center gap-3">
+          <div class="asignacion-exitosa" id="mMsgExito" style="display:none;">
+            <i class="bi bi-star-fill me-1" style="color:#f59e0b;"></i>
+            Reasignación exitosa
+          </div>
+          <button class="btn btn-primary px-5" onclick="mReasignar()">
+            <i class="bi bi-send me-2"></i>Reasignar
+          </button>
+        </div>
+      </div>
+
+    </div><!-- fin vistaMantenedor -->
+
+    <!-- ─── MODAL CREAR USUARIO ─────────────────────────────────── -->
+    <div class="modal fade" id="modalCrearUsuario" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="bi bi-person-plus me-2"></i>Crear Usuario
+            </h5>
+            <button type="button" class="btn-close btn-close-white"
+              data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-3">
+
+              <div class="col-12">
+                <label class="form-label fw-bold">Licencia</label>
+                <select class="form-select" id="crearLicencia">
+                  <option value="">-- Seleccione licencia --</option>
+                </select>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label fw-bold">Zona</label>
+                <select class="form-select" id="crearZona"
+                  onchange="filtrarGruposModal('crear')">
+                  <option value="">-- Seleccione zona --</option>
+                </select>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label fw-bold">Grupo</label>
+                <select class="form-select" id="crearGrupo"
+                  onchange="filtrarSucursalesModal('crear')">
+                  <option value="">-- Seleccione grupo --</option>
+                </select>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label fw-bold">Sucursal</label>
+                <select class="form-select" id="crearSucursal">
+                  <option value="">-- Seleccione sucursal --</option>
+                </select>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label fw-bold">Nombre de usuario</label>
+                <input type="text" class="form-control" id="crearNombre"
+                  placeholder="Ej: Juan Pérez">
+              </div>
+
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-outline-secondary"
+              data-bs-dismiss="modal">Cancelar</button>
+            <button class="btn btn-primary" onclick="confirmarCrearUsuario()">
+              <i class="bi bi-check-circle me-1"></i>Crear
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── MODAL BAJA USUARIO ──────────────────────────────────── -->
+    <div class="modal fade" id="modalBajaUsuario" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header" style="background:#dc2626;">
+            <h5 class="modal-title text-white">
+              <i class="bi bi-person-dash me-2"></i>Baja de Usuario
+            </h5>
+            <button type="button" class="btn-close btn-close-white"
+              data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-3">
+
+              <div class="col-12">
+                <label class="form-label fw-bold">Zona</label>
+                <select class="form-select" id="bajaZona"
+                  onchange="filtrarUsuariosBaja()">
+                  <option value="">-- Todas las zonas --</option>
+                </select>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label fw-bold">Grupo</label>
+                <select class="form-select" id="bajaGrupo"
+                  onchange="filtrarUsuariosBaja()">
+                  <option value="">-- Todos los grupos --</option>
+                </select>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label fw-bold">Sucursal</label>
+                <select class="form-select" id="bajaSucursal"
+                  onchange="filtrarUsuariosBaja()">
+                  <option value="">-- Todas las sucursales --</option>
+                </select>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label fw-bold">Usuario</label>
+                <select class="form-select" id="bajaUsuarioSelect">
+                  <option value="">-- Seleccione usuario --</option>
+                </select>
+                <div class="form-text text-muted">
+                  Filtre por zona / grupo / sucursal para acotar la lista
+                </div>
+              </div>
+
+              <div class="col-12" id="bajaUsuarioInfo" style="display:none;">
+                <div class="alert alert-warning mb-0 d-flex align-items-center gap-2">
+                  <i class="bi bi-exclamation-triangle-fill"></i>
+                  <div>Esta acción <strong>desactiva</strong> al usuario seleccionado.</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-outline-secondary"
+              data-bs-dismiss="modal">Cancelar</button>
+            <button class="btn btn-danger" onclick="confirmarBajaUsuario()">
+              <i class="bi bi-person-x me-1"></i>Dar de baja
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================ -->
+    <!-- VISTA MANTENEDOR JEFE SUCURSAL   -->
+    <!-- ================================ -->
+    <div id="vistaMantenedorJefe" style="display:none;">
+      
+      <!-- SELECTOR SUCURSAL -->
+      <div class="section-card mb-4">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <div class="jefe-header">Mantenedor Jefe de Sucursal</div>
+            <div class="subtitle">Reasignación de registros entre ejecutivos</div>
+          </div>
+          <div class="col-md-6">
+            <label class="fw-bold mb-2">Sucursal activa</label>
+            <select class="form-select" id="mjSucursalActiva"
+              onchange="mjActualizarRegistros()">
+              <option value="">-- Seleccione sucursal --</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Badge registros asignados -->
+      <div class="registros-badge mb-4">
+        <div>
+          <div class="label">Cantidad de registros Asignados</div>
+          <div class="label" style="opacity:.7; font-size:13px;">Total distribuido desde Orquestador</div>
+        </div>
+        <div class="value" id="mjRegistrosAsignados">0</div>
+      </div>
+
+      <!-- FILTROS -->
+      <div class="section-card mb-4">
+        <div class="section-title text-center mb-1">
+          <i class="bi bi-arrow-left-right me-2"></i>Reasignación de Registros
+        </div>
+        <div class="subtitle text-center mb-4">Filtros de selección</div>
+
+        <div class="row g-3">
+          <div class="col-md-5">
+            <div class="filtros-grid">
+              <div class="filtro-row">
+                <label class="filtro-lbl">Estado del registro</label>
+                <select class="form-select form-select-sm" id="mjFiltroEstado">
+                  <option>Venta realizada</option>
+                  <option>Pendiente por gestión</option>
+                  <option>En gestión</option>
+                </select>
+              </div>
+              <div class="filtro-row">
+                <label class="filtro-lbl">Producto</label>
+                <select class="form-select form-select-sm" id="mjFiltroProducto">
+                  <option>RDR_REPA</option>
+                  <option>CONSOLIDACIÓN</option>
+                  <option>HIPOTECARIO</option>
+                </select>
+              </div>
+              <div class="filtro-row">
+                <label class="filtro-lbl">Ordenar</label>
+                <select class="form-select form-select-sm" id="mjFiltroOrden">
+                  <option>De menor a mayor</option>
+                  <option>De mayor a menor</option>
+                </select>
+              </div>
+            </div>
+            <div class="mt-3 text-end">
+              <button class="btn btn-outline-secondary btn-sm me-2" onclick="mjLimpiarFiltros()">
+                <i class="bi bi-x-circle me-1"></i>Limpiar
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="mjBuscarRegistros()">
+                <i class="bi bi-search me-1"></i>Buscar
+              </button>
+            </div>
+          </div>
+
+          <div class="col-md-7">
+            <div class="fw-bold mb-2 text-uppercase" style="font-size:.8rem; letter-spacing:.06em; color:#555;">
+              <i class="bi bi-table me-1"></i>Visualización Data a Asignar
+            </div>
+            <div class="table-responsive">
+              <table class="table table-sm table-bordered table-hover align-middle mb-0">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Producto</th>
+                    <th>Asignación</th>
+                    <th>Monto</th>
+                    <th>Segmento</th>
+                  </tr>
+                </thead>
+                <tbody id="mjTbodyPreview">
+                  <tr>
+                    <td colspan="4" class="text-center text-muted py-4">
+                      <i class="bi bi-search me-1"></i>Aplique filtros para ver datos
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL REASIGNACIÓN -->
+      <div class="section-card mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="section-title mb-0">
+            <i class="bi bi-send me-2"></i>Reasignar a Ejecutivos
+          </div>
+          <div class="d-flex align-items-center gap-3">
+            <span class="text-muted small">Disponible:</span>
+            <strong id="mjTotalSucursal" class="text-primary">0</strong>
+            <span class="text-muted small ms-2">Sin asignar:</span>
+            <strong id="mjSinAsignar" style="color:var(--danger);">0</strong>
+          </div>
+        </div>
+
+        <div class="table-responsive mb-3">
+          <table class="table table-sm table-bordered align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th style="width:36px"></th>
+                <th>Ejecutivo</th>
+                <th style="width:160px">Registros</th>
+                <th style="width:36px"></th>
+              </tr>
+            </thead>
+            <tbody id="mjTbodyReasignacion">
+              <tr>
+                <td colspan="4" class="text-center text-muted py-3">
+                  Seleccione una sucursal para ver sus ejecutivos
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center">
+          <button class="btn btn-outline-secondary btn-sm" onclick="mjAgregarFila()">
+            <i class="bi bi-plus-circle me-1"></i>Agregar fila
+          </button>
+          <div class="d-flex align-items-center gap-3">
+            <div class="asignacion-exitosa" id="mjMsgExito" style="display:none;">
+              <i class="bi bi-star-fill me-1" style="color:#f59e0b;"></i>Asignación exitosa
+            </div>
+            <button class="btn btn-primary px-5" onclick="mjReasignar()">
+              <i class="bi bi-arrow-left-right me-2"></i>Reasignar
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- fin vistaMantenedorJefe -->
+
+  </div><!-- fin main-container -->
+
+  <!-- MODAL ORQUESTADOR -->
+  <div class="modal fade" id="modalResumen" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Resumen de Distribución</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="contenidoResumen"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ALERTA PERSONALIZADA -->
+  <div class="modal fade" id="customAlert" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">Alerta</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="customAlertMessage"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="scripts.js"></script>
+</body>
+</html>
