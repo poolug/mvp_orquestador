@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Orquestador - Asignación de Carteras</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
 
   <div class="main-container">
@@ -23,10 +25,6 @@
         <div class="col-md-4">
           <label class="fw-bold mb-2">Producto</label>
           <select class="form-select" id="producto">
-            <option value="1000">CONSOLIDACIÓN</option>
-            <option value="2500">HIPOTECARIO</option>
-            <option value="800">CONSUMO</option>
-            <option value="4000">EMPRESAS</option>
           </select>
         </div>
       </div>
@@ -37,14 +35,17 @@
       <a class="nav-link active" id="tab-orquestador" onclick="cambiarTab('orquestador')">
         <i class="bi bi-diagram-3 me-2"></i>Orquestador
       </a>
-      <a class="nav-link" id="tab-jefe" onclick="cambiarTab('jefe')">
-        <i class="bi bi-person-badge me-2"></i>Jefe de Sucursal
-      </a>
       <a class="nav-link" id="tab-mantenedor" onclick="cambiarTab('mantenedor')">
         <i class="bi bi-building-gear me-2"></i>Mantenedor Casa Matriz y Zonal
       </a>
       <a class="nav-link" id="tab-mantenedor-jefe" onclick="cambiarTab('mantenedorJefe')">
         <i class="bi bi-person-lines-fill me-2"></i>Mantenedor Jefe de Sucursal
+      </a>
+      <a class="nav-link" id="tab-jefe" onclick="cambiarTab('jefe')">
+        <i class="bi bi-person-badge me-2"></i>Jefe de Sucursal
+      </a>
+      <a class="nav-link" id="tab-ejecutivo" onclick="cambiarTab('ejecutivo')">
+        <i class="bi bi-headset me-2"></i>Gestor de Atención
       </a>
     </div>
 
@@ -96,9 +97,9 @@
           </div>
         </div>
         <div class="text-end mt-4">
-            <button class="btn btn-primary" id="guardarGrupo">
-                <i class="bi bi-save"></i> Guardar Distribución Grupo
-            </button>
+          <button class="btn btn-primary" id="guardarGrupo">
+            <i class="bi bi-save"></i> Guardar Distribución Grupo
+          </button>
         </div>
       </div>
 
@@ -153,8 +154,7 @@
             </label>
             <div class="input-group input-group-sm">
               <span class="input-group-text">$</span>
-              <input type="number" id="filtroMontoMin" class="form-control"
-                placeholder="Ej: 1000000" min="0"
+              <input type="number" id="filtroMontoMin" class="form-control" placeholder="Ej: 1000000" min="0"
                 oninput="aplicarFiltrosMonto()">
             </div>
           </div>
@@ -165,8 +165,7 @@
             </label>
             <div class="input-group input-group-sm">
               <span class="input-group-text">$</span>
-              <input type="number" id="filtroMontoMax" class="form-control"
-                placeholder="Ej: 5000000" min="0"
+              <input type="number" id="filtroMontoMax" class="form-control" placeholder="Ej: 5000000" min="0"
                 oninput="aplicarFiltrosMonto()">
             </div>
           </div>
@@ -198,7 +197,8 @@
           <div class="col-md-5">
             <div class="search-box">
               <i class="bi bi-search"></i>
-              <input type="text" id="buscarEjecutivo" class="form-control" placeholder="Buscar ejecutivo..." oninput="filtrarEjecutivos()">
+              <input type="text" id="buscarEjecutivo" class="form-control" placeholder="Buscar ejecutivo..."
+                oninput="filtrarEjecutivos()">
             </div>
           </div>
           <div class="col-md-4 d-flex align-items-center gap-3 d-none">
@@ -288,26 +288,22 @@
         <!-- Filtros rápidos tabla usuarios -->
         <div class="row g-2 mb-3">
           <div class="col-md-3">
-            <select class="form-select form-select-sm" id="filtroTablaZona"
-              onchange="renderTablaUsuarios()">
+            <select class="form-select form-select-sm" id="filtroTablaZona" onchange="renderTablaUsuarios()">
               <option value="">Todas las zonas</option>
             </select>
           </div>
           <div class="col-md-3">
-            <select class="form-select form-select-sm" id="filtroTablaSucursal"
-              onchange="renderTablaUsuarios()">
+            <select class="form-select form-select-sm" id="filtroTablaSucursal" onchange="renderTablaUsuarios()">
               <option value="">Todas las sucursales</option>
             </select>
           </div>
           <div class="col-md-3">
-            <select class="form-select form-select-sm" id="filtroTablaLicencia"
-              onchange="renderTablaUsuarios()">
+            <select class="form-select form-select-sm" id="filtroTablaLicencia" onchange="renderTablaUsuarios()">
               <option value="">Todas las licencias</option>
             </select>
           </div>
           <div class="col-md-3">
-            <button class="btn btn-outline-secondary btn-sm w-100"
-              onclick="limpiarFiltrosTabla()">
+            <button class="btn btn-outline-secondary btn-sm w-100" onclick="limpiarFiltrosTabla()">
               <i class="bi bi-x-circle me-1"></i>Limpiar filtros
             </button>
           </div>
@@ -344,8 +340,7 @@
           <!-- Producto -->
           <div class="col-md-3">
             <label class="filtro-lbl">Producto</label>
-            <select class="form-select form-select-sm" id="mFiltroProducto"
-              onchange="mCargarFechas()">
+            <select class="form-select form-select-sm" id="mFiltroProducto" onchange="mCargarFechas()">
               <option value="">-- Seleccione --</option>
               <option>CONSOLIDACIÓN</option>
               <option>HIPOTECARIO</option>
@@ -365,8 +360,7 @@
           <!-- Cantidad de registros (solo lectura, se llena al buscar) -->
           <div class="col-md-2">
             <label class="filtro-lbl">Cantidad registros</label>
-            <input type="text" class="form-control form-control-sm"
-              id="mCantidadRegistros" readonly placeholder="—">
+            <input type="text" class="form-control form-control-sm" id="mCantidadRegistros" readonly placeholder="—">
           </div>
 
           <!-- Monto orden -->
@@ -383,8 +377,7 @@
             <button class="btn btn-primary btn-sm flex-fill" onclick="mBuscarRegistros()">
               <i class="bi bi-search me-1"></i>Buscar
             </button>
-            <button class="btn btn-outline-secondary btn-sm" onclick="mLimpiarFiltros()"
-              title="Limpiar">
+            <button class="btn btn-outline-secondary btn-sm" onclick="mLimpiarFiltros()" title="Limpiar">
               <i class="bi bi-x-circle"></i>
             </button>
           </div>
@@ -408,8 +401,7 @@
             <thead style="position:sticky; top:0; z-index:2;">
               <tr>
                 <th style="width:36px">
-                  <input type="checkbox" class="form-check-input" id="checkTodos"
-                    onchange="toggleCheckTodos(this)">
+                  <input type="checkbox" class="form-check-input" id="checkTodos" onchange="toggleCheckTodos(this)">
                 </th>
                 <th>Producto</th>
                 <th>Asignación</th>
@@ -481,8 +473,7 @@
             <h5 class="modal-title">
               <i class="bi bi-person-plus me-2"></i>Crear Usuario
             </h5>
-            <button type="button" class="btn-close btn-close-white"
-              data-bs-dismiss="modal"></button>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
             <div class="row g-3">
@@ -496,16 +487,14 @@
 
               <div class="col-12">
                 <label class="form-label fw-bold">Zona</label>
-                <select class="form-select" id="crearZona"
-                  onchange="filtrarGruposModal('crear')">
+                <select class="form-select" id="crearZona" onchange="filtrarGruposModal('crear')">
                   <option value="">-- Seleccione zona --</option>
                 </select>
               </div>
 
               <div class="col-12">
                 <label class="form-label fw-bold">Grupo</label>
-                <select class="form-select" id="crearGrupo"
-                  onchange="filtrarSucursalesModal('crear')">
+                <select class="form-select" id="crearGrupo" onchange="filtrarSucursalesModal('crear')">
                   <option value="">-- Seleccione grupo --</option>
                 </select>
               </div>
@@ -519,15 +508,13 @@
 
               <div class="col-12">
                 <label class="form-label fw-bold">Nombre de usuario</label>
-                <input type="text" class="form-control" id="crearNombre"
-                  placeholder="Ej: Juan Pérez">
+                <input type="text" class="form-control" id="crearNombre" placeholder="Ej: Juan Pérez">
               </div>
 
             </div>
           </div>
           <div class="modal-footer">
-            <button class="btn btn-outline-secondary"
-              data-bs-dismiss="modal">Cancelar</button>
+            <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
             <button class="btn btn-primary" onclick="confirmarCrearUsuario()">
               <i class="bi bi-check-circle me-1"></i>Crear
             </button>
@@ -544,32 +531,28 @@
             <h5 class="modal-title text-white">
               <i class="bi bi-person-dash me-2"></i>Baja de Usuario
             </h5>
-            <button type="button" class="btn-close btn-close-white"
-              data-bs-dismiss="modal"></button>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
             <div class="row g-3">
 
               <div class="col-12">
                 <label class="form-label fw-bold">Zona</label>
-                <select class="form-select" id="bajaZona"
-                  onchange="filtrarUsuariosBaja()">
+                <select class="form-select" id="bajaZona" onchange="filtrarUsuariosBaja()">
                   <option value="">-- Todas las zonas --</option>
                 </select>
               </div>
 
               <div class="col-12">
                 <label class="form-label fw-bold">Grupo</label>
-                <select class="form-select" id="bajaGrupo"
-                  onchange="filtrarUsuariosBaja()">
+                <select class="form-select" id="bajaGrupo" onchange="filtrarUsuariosBaja()">
                   <option value="">-- Todos los grupos --</option>
                 </select>
               </div>
 
               <div class="col-12">
                 <label class="form-label fw-bold">Sucursal</label>
-                <select class="form-select" id="bajaSucursal"
-                  onchange="filtrarUsuariosBaja()">
+                <select class="form-select" id="bajaSucursal" onchange="filtrarUsuariosBaja()">
                   <option value="">-- Todas las sucursales --</option>
                 </select>
               </div>
@@ -594,8 +577,7 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button class="btn btn-outline-secondary"
-              data-bs-dismiss="modal">Cancelar</button>
+            <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
             <button class="btn btn-danger" onclick="confirmarBajaUsuario()">
               <i class="bi bi-person-x me-1"></i>Dar de baja
             </button>
@@ -608,7 +590,7 @@
     <!-- VISTA MANTENEDOR JEFE SUCURSAL   -->
     <!-- ================================ -->
     <div id="vistaMantenedorJefe" style="display:none;">
-      
+
       <!-- SELECTOR SUCURSAL -->
       <div class="section-card mb-4">
         <div class="row align-items-center">
@@ -618,8 +600,7 @@
           </div>
           <div class="col-md-6">
             <label class="fw-bold mb-2">Sucursal activa</label>
-            <select class="form-select" id="mjSucursalActiva"
-              onchange="mjActualizarRegistros()">
+            <select class="form-select" id="mjSucursalActiva" onchange="mjActualizarRegistros()">
               <option value="">-- Seleccione sucursal --</option>
             </select>
           </div>
@@ -757,7 +738,180 @@
 
     </div><!-- fin vistaMantenedorJefe -->
 
+    <!-- ===================== -->
+    <!-- VISTA EJECUTIVO       -->
+    <!-- ===================== -->
+    <div id="vistaEjecutivo" style="display:none;">
+
+      <!-- HEADER EJECUTIVO -->
+      <div class="section-card mb-4">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <div class="jefe-header">Interfaz del ejecutivo</div>
+            <div class="subtitle text-success fw-bold">Mantener la vista del ejecutivo de acuerdo a la asignación de la
+              jefatura en orden y prioridad</div>
+          </div>
+          <div class="col-md-6">
+            <label class="fw-bold mb-2">Seleccionar Ejecutivo</label>
+            <select class="form-select" id="ejecutivoAtencionActivo" onchange="cargarVistaAtencion()">
+              <option value="">-- Seleccione ejecutivo --</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTON NUEVO REGISTRO -->
+      <div class="mb-4">
+        <button class="btn btn-dark" style="background-color: #1e3a5f;" onclick="abrirModalCrearRegistro()">
+          <i class="bi bi-plus-circle me-2"></i>Crear nuevo Registro (Cliente nuevo)
+        </button>
+      </div>
+
+      <!-- BANDEJA Y FILTROS -->
+      <div class="row mb-4">
+        <div class="col-md-8">
+          <div class="section-title text-center mb-3">Bandeja</div>
+          <div class="d-flex justify-content-center text-center gap-4">
+            <div class="card shadow-sm border-0" style="background:#d0e6f2; min-width:130px; border-radius: 10px;">
+              <div class="card-body p-3">
+                <div class="fw-bold text-uppercase" style="color: #1e3a5f; letter-spacing: 1px;">Pendiente</div>
+                <div class="fs-2 fw-bold bg-white mt-2 border rounded shadow-sm text-warning" id="countPendiente">0
+                </div>
+              </div>
+            </div>
+            <div class="card shadow-sm border-0" style="background:#d0e6f2; min-width:130px; border-radius: 10px;">
+              <div class="card-body p-3">
+                <div class="fw-bold text-uppercase" style="color: #1e3a5f; letter-spacing: 1px;">Gestionado</div>
+                <div class="fs-2 fw-bold bg-white mt-2 border rounded shadow-sm text-info" id="countGestionado">0</div>
+              </div>
+            </div>
+            <div class="card shadow-sm border-0" style="background:#d0e6f2; min-width:130px; border-radius: 10px;">
+              <div class="card-body p-3">
+                <div class="fw-bold text-uppercase" style="color: #1e3a5f; letter-spacing: 1px;">Cerrado</div>
+                <div class="fs-2 fw-bold bg-white mt-2 border rounded shadow-sm text-success" id="countCerrado">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 d-flex flex-column justify-content-center align-items-center">
+          <select class="form-select w-75 mb-4 fw-bold"
+            style="border: 1px solid #1e5b85; color: #1e3a5f;" id="filtroAtencionEstado"
+            onchange="renderTablaAtencion()">
+            <option value="">Filtro de estado (Todos)</option>
+            <option value="Pendiente">Pendiente</option>
+            <option value="Gestionado">Gestionado</option>
+            <option value="Cerrado">Cerrado</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- TABLA DE ATENCIÓN -->
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered table-sm align-middle text-center" style="border-color:#1e3a5f;">
+          <thead style="background:#d0e6f2;">
+            <tr>
+              <th>RUT / ID</th>
+              <th>Monto</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyAtencion">
+            <tr>
+              <td colspan="4" class="text-center text-muted py-3">Seleccione un ejecutivo para ver sus registros</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div><!-- fin vistaEjecutivo -->
+
   </div><!-- fin main-container -->
+
+  <!-- MODAL LLAMADA EJECUTIVO -->
+  <div class="modal fade" id="modalLlamada" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title"><i class="bi bi-telephone-inbound-fill me-2 text-success"></i>Llamada en curso</h5>
+        </div>
+        <div class="modal-body">
+          <div class="text-center mb-3">
+            <div class="fs-5 fw-bold" id="llamadaNombre">Nombre del Cliente</div>
+            <div class="text-muted" id="llamadaRUT">12.345.678-9</div>
+            <div class="badge bg-primary mt-1" id="llamadaMonto">$0</div>
+          </div>
+
+          <hr>
+
+          <div class="mb-3">
+            <label class="fw-bold mb-1">Tipificación <span class="text-danger">*</span></label>
+            <select class="form-select" id="llamadaTipificacion">
+              <option value="">-- Seleccione una opción --</option>
+              <option value="No es el contacto">No es el contacto</option>
+              <option value="No interesado">No interesado</option>
+              <option value="No llamar mas">No llamar mas</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="fw-bold mb-1">Observación <span class="text-danger">*</span></label>
+            <textarea class="form-control" id="llamadaObservacion" rows="3"
+              placeholder="Ingrese detalles de la llamada..."></textarea>
+          </div>
+
+        </div>
+        <div class="modal-footer justify-content-between">
+          <div class="text-danger small" id="llamadaError" style="display:none;">Debe completar todos los campos
+            obligatorios.</div>
+          <button class="btn btn-danger w-100 fw-bold" onclick="colgarLlamada()">
+            <i class="bi bi-telephone-x-fill me-2"></i>Colgar y Guardar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CREAR REGISTRO -->
+  <div class="modal fade" id="modalCrearRegistro" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title"><i class="bi bi-person-plus-fill me-2 text-primary"></i>Crear nuevo Registro</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="fw-bold mb-1 small">Nombre <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-sm" id="crNombre" placeholder="Nombre completo">
+            </div>
+            <div class="col-md-6">
+              <label class="fw-bold mb-1 small">RUT <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-sm" id="crRut" placeholder="12.345.678-9">
+            </div>
+            <div class="col-md-6">
+              <label class="fw-bold mb-1 small">Campaña <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-sm" id="crCampana" placeholder="Ej: REPA">
+            </div>
+            <div class="col-md-6">
+              <label class="fw-bold mb-1 small">Teléfono</label>
+              <input type="text" class="form-control form-control-sm" id="crTelefono" placeholder="Ej: 987654321">
+            </div>
+            <div class="col-md-6">
+              <label class="fw-bold mb-1 small">Monto ($)</label>
+              <input type="number" class="form-control form-control-sm" id="crMonto" placeholder="Ej: 500000">
+            </div>
+          </div>
+          <div class="text-danger small mt-2" id="crError" style="display:none;">Debe completar los campos obligatorios.</div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+          <button class="btn btn-dark btn-sm px-4" style="background-color: #1e3a5f;" onclick="guardarNuevoRegistro()">Guardar Registro</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- MODAL ORQUESTADOR -->
   <div class="modal fade" id="modalResumen" tabindex="-1">
@@ -811,5 +965,11 @@
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="scripts.js"></script>
+  <script>
+    $(document).ready(function () {
+      inicializarApp();
+    });
+  </script>
 </body>
+
 </html>
